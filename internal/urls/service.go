@@ -2,10 +2,9 @@ package urls
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
-	"strings"
+
+	"github.com/calqs/frogshort/pkg/code"
 )
 
 type Service struct {
@@ -24,28 +23,11 @@ func NewService(
 }
 
 const (
-	codeLength  = 7
-	base62Chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	codeLength = 7
 )
 
-func generateCode(n int) (string, error) {
-	var sb strings.Builder
-	sb.Grow(n)
-
-	for range n {
-		max := big.NewInt(int64(len(base62Chars)))
-		num, err := rand.Int(rand.Reader, max)
-		if err != nil {
-			return "", err
-		}
-		sb.WriteByte(base62Chars[num.Int64()])
-	}
-
-	return sb.String(), nil
-}
-
 func (s *Service) ShortenURL(ctx context.Context, longURL string) (string, error) {
-	code, err := generateCode(codeLength)
+	code, err := code.Generate(codeLength)
 	if err != nil {
 		return "", fmt.Errorf("failed to generate code: %w", err)
 	}
