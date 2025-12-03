@@ -1,7 +1,6 @@
 SHELL := /bin/bash
 
 APP_NAME     := frogshort
-SERVICE_DIR  := goShort
 CMD_DIR      := $(SERVICE_DIR)/cmd
 BINARY       := $(APP_NAME)
 
@@ -13,8 +12,6 @@ help:
 	@echo ""
 	@echo " Main commands:"
 	@echo "   make run           - run Go service locally (no Docker)"
-	@echo "   make build         - build Go binary locally"
-	@echo "   make clean         - remove local binary"
 	@echo ""
 	@echo " Docker / Compose:"
 	@echo "   make compose-up    - docker compose up --build (app + Postgres)"
@@ -26,7 +23,6 @@ help:
 	@echo ""
 	@echo " Go tooling:"
 	@echo "   make tidy          - go mod tidy in goShort/"
-	@echo "   make fmt           - go fmt ./... in goShort/"
 	@echo ""
 	@echo "==================================================================="
 	@echo ""
@@ -35,19 +31,10 @@ help:
 .PHONY: run build clean \
 				tidy fmt
 run:
-	cd $(SERVICE_DIR) && go run ./cmd/main.go
-
-build:
-	cd $(SERVICE_DIR) && go build -o ../$(BINARY) ./cmd/main.go
-
-clean:
-	rm -f $(BINARY)
+	go run ./cmd/$(APP_NAME)/main.go
 
 tidy:
-	cd $(SERVICE_DIR) && go mod tidy
-
-fmt:
-	cd $(SERVICE_DIR) && go fmt ./...
+	go mod tidy
 
 # DOCKER / COMPOSE
 .PHONY: docker-build docker-run docker-stop \
@@ -83,4 +70,4 @@ re: compose-down compose-up
 # DATABASE
 .PHONY: db 
 db:
-	docker compose exec db psql -U "$$DB_USER" "$$DB_NAME"
+	docker compose exec db psql "postgres://dev:dev@127.0.0.1:5432/dev_db?options=-c%20search_path%3Dfrogshort"
