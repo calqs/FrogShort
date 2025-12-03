@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mini URL Shortener</title>
+  <style>
+    input, button {
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      width: 350px;
+      text-align: center;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ddd;
+      margin-bottom: 1rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+
+    #result {
+      margin-top: 1rem;
+      font-weight: bold;
+      color: #333;
+      word-break: break-all;
+    }
+
+    #message {
+      margin-top: 0.5rem;
+      font-size: 0.9rem;
+      color: #16a34a;
+      min-height: 1em;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <h2>URL Shortener</h2>
+
+    <input id="urlInput" type="text" placeholder="Enter URL..." />
+
+    <button onclick="shorten()">Shorten</button>
+
+    <div id="result"></div>
+    <div id="message"></div>
+  </div>
+
+  <script>
+    const input = document.getElementById("urlInput");
+    const result = document.getElementById("result");
+    const message = document.getElementById("message");
+
+    // Press Enter = shorten
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        shorten();
+      }
+    });
+
+    // Copy to clipboard when clicking the result
+    function enableCopy() {
+      const link = document.getElementById("shortLink");
+      if (!link) return;
+
+      link.addEventListener("click", async (e) => {
+        e.preventDefault();
+        await navigator.clipboard.writeText(link.href);
+        message.textContent = "Copied to clipboard!";
+        setTimeout(() => (message.textContent = ""), 1500);
+      });
+    }
+
+    async function shorten() {
+      const url = input.value.trim();
+      message.textContent = "";
+
+      if (!url) {
+        result.textContent = "Please enter a URL.";
+        return;
+      }
+
+      try {
+        const res = await fetch("/url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ url })
+        });
+
+        if (!res.ok) {
+          result.textContent = "Error: " + res.statusText;
+          return;
+        }
+
+        const data = await res.json();
+        result.innerHTML = data.short
+          ? `<a id="shortLink" href="${data.short}" target="_blank">${data.short}</a>`
+          : "Invalid response from server";
+
+        enableCopy();
+
+      } catch (err) {
+        result.textContent = "Network error.";
+      }
+    }
+  </script>
+</body>
+
+</html>

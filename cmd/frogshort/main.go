@@ -37,6 +37,9 @@ func main() {
 	}
 
 	h := router.NewRouter(ctx, router.WithBaseURL("/"))
+	h.Use(
+		urls.AllowAllCORS,
+	)
 	urls.Routes(h, pool, config.BaseURL)
 	server := &http.Server{
 		Addr:    ":" + config.Port,

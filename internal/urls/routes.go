@@ -24,7 +24,7 @@ func Routes(
 	baseURL string,
 ) {
 	h := NewModule(db, baseURL)
-	router.Handle("/", method.Post(h.ShortenURL))
+	router.Handle("/url", method.Post(h.ShortenURL))
 	router.Handle("/{code}", method.Get(h.Redirect))
 	router.Load()
 }
