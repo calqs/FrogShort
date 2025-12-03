@@ -17,3 +17,19 @@ services:
       interval: 3s
       timeout: 3s
       retries: 5
+
+  frogshort:
+    build:
+      context: ./goShort
+      dockerfile: Dockerfile
+    container_name: frogshort
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+volumes:
+  db_data:
