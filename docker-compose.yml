@@ -17,20 +17,6 @@ services:
       interval: 3s
       timeout: 3s
       retries: 5
-
-  # frogshort:
-  #   build:
-  #     context: .
-  #     dockerfile: Dockerfile.frogshort
-  #   container_name: frogshort
-  #   env_file: .env
-  #   depends_on:
-  #     db:
-  #       condition: service_healthy
-  #   ports:
-  #     - "8080:8080"
-  #   restart: unless-stopped
-
   migrate:
     image: postgres:16
     container_name: frog_db_migrate
@@ -48,5 +34,20 @@ services:
       - ./migrations:/migrations
     entrypoint: ["/migrations/run-migrations.sh"]
     restart: "no"
+
+  # frogshort:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile.frogshort
+  #   container_name: frogshort
+  #   env_file:
+  #     - .env
+  #   depends_on:
+  #     db:
+  #       condition: service_healthy
+  #   ports:
+  #     - "${PORT}:${PORT}"
+  #   restart: unless-stopped
+
 volumes:
   db_data:

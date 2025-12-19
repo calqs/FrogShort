@@ -1,8 +1,6 @@
 SHELL := /bin/bash
 
-APP_NAME     := frogshort
-CMD_DIR      := $(SERVICE_DIR)/cmd
-BINARY       := $(APP_NAME)
+APP_NAME := frogshort
 
 # HELP
 .PHONY: help
@@ -10,21 +8,23 @@ help:
 	@echo ""
 	@echo "====================== FROGSHORT — MAKE HELP ======================"
 	@echo ""
-	@echo " Main commands:"
-	@echo "   make run           - run Go service locally (no Docker)"
+	@echo " Local:"
+	@echo "   make run            - run Go service locally (no Docker)"
 	@echo ""
-	@echo " Docker / Compose:"
-	@echo "   make compose-up    - docker compose up --build (app + Postgres)"
-	@echo "   make compose-down  - docker compose down"
-	@echo "   make re            - restart stack (down + up)"
-	@echo "   make logs          - docker compose logs -f --tail=200"
-	@echo "   make ps            - docker compose ps"
-	@echo "   make down-v        - WARNING: down + remove volumes (DB data!)"
+	@echo " Compose:"
+	@echo "   make compose-build  - build images"
+	@echo "   make compose-up     - start stack (db + frogshort)"
+	@echo "   make compose-down   - stop stack"
+	@echo "   make logs           - follow logs"
+	@echo "   make ps             - show containers"
+	@echo "   make down-v         - stop + remove volumes"
+	@echo ""
+	@echo " DB:"
+	@echo "   make migrate        - run migrations container once"
+	@echo "   make psql           - open psql inside db container"
 	@echo ""
 	@echo " Go tooling:"
 	@echo "   make tidy          - go mod tidy in goShort/"
-	@echo ""
-	@echo "==================================================================="
 	@echo ""
 
 # GO LOCAL
@@ -45,7 +45,7 @@ docker-build:
 	docker compose build
 
 docker-run:
-	docker run --rm -p 8080:8080 --name $(APP_NAME) $(APP_NAME):latest
+	docker run --rm -p 8070:8070 --name $(APP_NAME) $(APP_NAME):latest
 
 docker-stop:
 	- docker stop $(APP_NAME)
@@ -68,6 +68,6 @@ down-v:
 re: compose-down compose-up
 
 # DATABASE
-.PHONY: db 
+.PHONY: db
 db:
 	docker compose exec db psql "postgres://dev:dev@127.0.0.1:5432/dev_db?options=-c%20search_path%3Dfrogshort"

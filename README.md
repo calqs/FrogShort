@@ -1,210 +1,117 @@
-# FrogShort 🐸
+<img title="FrogShort" alt="FrogShort" src="./img/banner.png" width="100%">
 
-A minimalistic and production-ready URL shortener written in Go, using **PostgreSQL** for persistent storage.  
-Fully containerized with **Docker** and **docker-compose**.
+<br/>
 
 <details>
 <summary>🇬🇧 ENGLISH VERSION</summary>
+Minimal Go URL shortener.
+
+## Roles & Scope
+Backend (**Go**), HTTP **API** design, persistence (**PostgreSQL**), env-based configuration.  
+Fully containerized with **Docker** and **docker-compose**.
 
 # Features
-
-### Create short links
-- `POST /shorten` with JSON body:  
+  - `POST /url` - creating short links
   ```json
-  {"url": "https://example.com"}
+  {
+    "url": "https://example.com"
+  }
   ```
-- or `GET /shorten?url=https://example.com`
-
-### Redirect using short code
-- `GET /{code}` → `302` redirect to the original URL
-
-### Persistent storage in PostgreSQL
-- The service stores all URLs in:
+  Request:
+  ```json
+  {
+    "short": "http://localhost:{PORT}/aB3kL9Q"
+  }
   ```
-  schema: frogshort
-  table: frogshort.urls
-  ```
+  redirect to the original URL  
+  `GET /{code}` → 302 + Location: <original_url>
 
-### Auto-creates database schema and table on startup
-
-### Safe & clean
-- Random Base62 codes  
-- Unique short codes  
-- Schema-level isolation  
-- Proper error handling  
-
----
-
-# Project Structure
-
+ex:
+```bash 
+make run
 ```
-FrogShort/
-│
-├── goShort/
-│   ├── cmd/main.go              # main Go application
-│   ├── go.mod                   # Go module
-│   ├── Dockerfile               # Dockerfile for Go service
-│   └── ...                      # (возможно pkg/, internal/ и др.)
-│
-├── postgres/
-│   ├── migrations/
-│   │   ├── 001_create_schema.sql
-│   │   ├── 002_create_urls_table.sql
-│   │   └── ... другие SQL миграции
-│   └── Dockerfile.postgres      # Custom PostgreSQL image (Init scripts)
-│
-├── docker-compose.yml           # Compose stack (Go + PostgreSQL)
-│
-├── .env.eample                  # Environment variables
-│
-└── README.md                    # Documentation
-```
-
----
-
-# API Endpoints
-
-## ➤ Create short URL — POST
-
-```
-POST /shorten
-Content-Type: application/json
-```
-
-### Body:
-```json
-{"url": "https://www.amazon.fr/..."}
-```
-
-### Response:
-```json
-{"short": "http://localhost:8080/aB3kL9Q"}
-```
-
----
-
-## ➤ Create short URL — GET
-```http
-GET /shorten?url=https://example.com
-```
-
----
-
-## ➤ Redirect
-```http
-GET /aB3kL9Q
-```
-Redirects to the stored original URL.
-
----
-
-# Running Locally (no Docker)
 ```bash
-cd goShort
-go mod tidy
-DB_URL="postgres://user:pass@localhost:5432/db?sslmode=disable&search_path=frogshort" PORT=8080 go run cmd/main.go
+ curl -X POST http://localhost:{PORT}/url \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com"}'
 ```
-
----
-
-# Docker
-## Build image
-```bash
-make docker-build
-```
-
-## Run container
-```bash
-make docker-run
-```
-
-## Stop container
-```bash
-make docker-stop
-```
-
----
-
-# Docker Compose (recommended)
-From the root `FrogShort/` directory:
-
-### Start services (Go + PostgreSQL)
-```bash
-make compose-up
-```
-
-### Stop services
-```bash
-make compose-down
-```
-
-Service will be available at:
-```http
-http://localhost:8080
-```
-
-PostgreSQL is available internally as:
-
-```
-host: db
-database: dev_db
-schema: frogshort
-```
-
----
-
-# Database Schema
-### Schema: `frogshort`
-### Table: `urls`
-
-| Column      | Type        | Notes                     |
-|-------------|-------------|----------------------------|
-| id          | SERIAL      | Primary key               |
-| code        | TEXT        | Unique short code         |
-| long_url    | TEXT        | Original URL              |
-| created_at  | TIMESTAMPTZ | Automatically set          |
-
-Schema is auto-created on startup — no migrations needed.
-
----
-
-# Example Flow
-
-### Create a short URL:
-```
-curl "http://localhost:8080/shorten?url=https://github.com"
-```
-
-### Response:
-```json
-{"short":"http://localhost:8080/Fq29aBc"}
-```
-
-### Open short link:
-```
-http://localhost:8080/Fq29aBc
-```
-
----
-
-# FrogShort
-A simple, clean, production-ready URL shortener.  
-Fast like a frog jump. 🐸💨
-
 </details>
 
 ---
 
 <details> <summary>🇫🇷 FRENCH VERSION</summary>
-Un raccourcisseur d’URL minimaliste en Go, empaqueté avec Docker et docker-compose.
+Un raccourcisseur d'URL minimaliste en Go.
 
+## Rôles et domaines d'application
+Backend (**Go**), conception de **API** HTTP, stockage des données (**PostgreSQL**), configuration basée sur l'env.
+Entièrement containerisé avec **Docker** et **docker-compose**.
 
+## Fonctions
+  - `POST /url` - créer des liens courts
+  ```json
+  {"url": "https://example.com"}
+  ```
+  Réponse:
+  ```json
+  {"short": "http://localhost:{PORT}/aB3kL9Q"}
+  ```
+  redirection vers l’URL d’origine  
+  `GET /{code}` → 302 + Location: <original_url>
+
+ex:
+```bash 
+make run
+```
+```bash
+ curl -X POST http://localhost:{PORT}/url \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com"}'
+```
 </details>
 
 ---
 
 <details>
 <summary>🇷🇺 RUSSIAN VERSION</summary>
-Минималистичный URL-shortener на Go, упакованный в Docker и docker-compose.
+Минималистичный URL-shortener на Go.
 
+## Роли и области применения
+Бэкенд (**Go**), проектирование HTTP **API**, хранение данных (**PostgreSQL**), конфигурация на env.
+Полностью контейнеризирован с помощью **Docker** и **docker-compose**.
+
+## Функции
+  - `POST /url` - cоздание коротких ссылок
+  ```json
+  {"url": "https://example.com"}
+  ```
+  ответ:
+  ```json
+  {"short": "http://localhost:{PORT}/aB3kL9Q"}
+  ```
+  редирект на оригинальный URL  
+  `GET /{code}` → 302 + Location: <original_url>
+
+ex:
+```bash 
+make run
+```
+```bash
+ curl -X POST http://localhost:{PORT}/url \
+  -H "Content-Type: application/json" \
+  -d '{"url":"https://example.com"}'
+```
 </details>
+
+<br/>
+
+# FrogShort
+A simple, clean, production-ready URL shortener.  
+Fast like a frog jump. 🐸💨
+
+## Authors
+Full pipeline design  
+Made with 🤍 by:
+- [monkeydioude](https://github.com/monkeydioude)
+- [N0fish](https://github.com/N0fish)
+
+> This project was developed by The calq Studio Team (N0fish, monkeydioude) in December 2025.
