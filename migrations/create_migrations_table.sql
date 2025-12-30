@@ -1,5 +1,5 @@
 -- migrations/init.sql
-SET search_path TO spendbaker;
+SET search_path TO frogshort;
 
 CREATE TABLE schema_migrations (
     id UUID PRIMARY KEY uuid_generate_v7(),
